@@ -1,4 +1,5 @@
 from pydantic import BaseSettings, Field
+from typing import Optional
 
 
 class Settings(BaseSettings):
@@ -11,6 +12,8 @@ class Settings(BaseSettings):
     secret_key: str = Field(..., env="SECRET_KEY")
     algorithm: str = Field(..., env="ALGORITHM")
     access_token_expire_minutes: int = Field(..., env="ACCESS_TOKEN_EXPIRE_MINUTES")
+    # Optional single URL (e.g. provided by Render, Heroku, Railway):
+    database_url: Optional[str] = Field(None, env="DATABASE_URL")
 
     class Config:
         env_file = ".env"

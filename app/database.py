@@ -6,7 +6,12 @@ from psycopg2.extras import RealDictCursor
 import time
 from .config import settings
 
-SQLALCHEMY_DATABASE_URL = f'postgresql://{settings.database_username}:{settings.database_password}@{settings.database_hostname}:{settings.database_port}/{settings.database_name}'
+# Allow a single DATABASE_URL to be provided by the host (Render, Heroku, etc.).
+# Fallback to individual DB_* settings when DATABASE_URL is not present.
+if settings.database_url:
+    SQLALCHEMY_DATABASE_URL = settings.database_url
+else:
+    SQLALCHEMY_DATABASE_URL = f'postgresql://{settings.database_username}:{settings.database_password}@{settings.database_hostname}:{settings.database_port}/{settings.database_name}'
 
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
