@@ -57,6 +57,24 @@ Deployment
 ----------
 This project includes a `Dockerfile` for containerized deployment. You can deploy to providers like Fly.io, Railway, Render or Cloud Run. See the repository for example CI workflow.
 
+Render-specific notes
+---------------------
+If you deploy to Render (render.com) using a Python service, set these fields in the Render dashboard:
+
+- Build Command:
+
+```bash
+pip install -r requirements.txt
+```
+
+- Start Command (example using Gunicorn with Uvicorn workers):
+
+```bash
+gunicorn -k uvicorn.workers.UvicornWorker app.main:app --bind 0.0.0.0:$PORT
+```
+
+Make sure `gunicorn` is present in `requirements.txt` (it is included in this repo). Render will set the `$PORT` environment variable for you.
+
 Contributing
 ------------
 PRs welcome. Please open an issue first for larger changes.
