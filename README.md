@@ -53,6 +53,8 @@ ALGORITHM=HS256
 ACCESS_TOKEN_EXPIRE_MINUTES=30
 ```
 
+If you deploy on Render (or similar), you must set these environment variables in the service's Environment section (Render dashboard -> Environment) — otherwise the app will fail at startup because `pydantic` validates required settings on boot. A template `.env.example` is included in the repository.
+
 Deployment
 ----------
 This project includes a `Dockerfile` for containerized deployment. You can deploy to providers like Fly.io, Railway, Render or Cloud Run. See the repository for example CI workflow.
