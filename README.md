@@ -1,86 +1,25 @@
 # Social_Media_Backend_By_FastAPI
 
-This is a FastAPI-based backend for a simple social media application. The repository includes:
+Minimal FastAPI backend intended for Render deployment.
 
-- FastAPI application with routers for posts, users, authentication, and votes
-- SQLAlchemy models and Alembic migration scripts
-- Utility functions for password hashing and OAuth2/JWT authentication
-- Pytest-based tests for core functionality
+What's in this repo
+- app/ - FastAPI application
+- alembic/ - database migrations
+- requirements.txt - Python dependencies
 
-This README contains quick setup and deployment instructions.
+Render quick deploy
+1) Create a Web Service on Render and connect this GitHub repo.
+2) Add these Environment variables in the Render service settings:
+	- DATABASE_URL (postgresql://...)
+	- SECRET_KEY
+	- ALGORITHM (e.g. HS256)
+	- ACCESS_TOKEN_EXPIRE_MINUTES (e.g. 30)
+3) Set Build Command: pip install -r requirements.txt
+4) Set Start Command: gunicorn -k uvicorn.workers.UvicornWorker app.main:app --bind 0.0.0.0:$PORT
 
-Requirements
-------------
-- Python 3.12+
+Notes
+- Do NOT commit `.env` or other secrets. Use Render's Environment settings.
+- This repository intentionally excludes Docker/CI/test artifacts for a minimal deploy.
 
-Quick start (local)
--------------------
-1. Create and activate a virtual environment:
-
-```bash
-python -m venv .venv
-source .venv/Scripts/activate   # Windows: .venv\\Scripts\\activate
-```
-
+If you'd like I can add an automated migration step (render.yaml or GitHub Actions) later.
 2. Install dependencies:
-
-```bash
-pip install -r requirements.txt
-```
-
-3. Create a `.env` file with the required environment variables (see "Environment variables" below).
-
-4. Run the app (development):
-
-```bash
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-```
-
-Visit http://localhost:8000/docs for the interactive API docs.
-
-Environment variables
----------------------
-Create a `.env` file in the repo root with these variables:
-
-```
-DATABASE_HOSTNAME=localhost
-DATABASE_PORT=5432
-DATABASE_NAME=fastapi
-DATABASE_USERNAME=postgres
-DATABASE_PASSWORD=yourpassword
-SECRET_KEY=replace-with-a-secure-random-value
-ALGORITHM=HS256
-ACCESS_TOKEN_EXPIRE_MINUTES=30
-```
-
-If you deploy on Render (or similar), you must set these environment variables in the service's Environment section (Render dashboard -> Environment) — otherwise the app will fail at startup because `pydantic` validates required settings on boot. A template `.env.example` is included in the repository.
-
-Deployment
-----------
-This project includes a `Dockerfile` for containerized deployment. You can deploy to providers like Fly.io, Railway, Render or Cloud Run. See the repository for example CI workflow.
-
-Render-specific notes
----------------------
-If you deploy to Render (render.com) using a Python service, set these fields in the Render dashboard:
-
-- Build Command:
-
-```bash
-pip install -r requirements.txt
-```
-
-- Start Command (example using Gunicorn with Uvicorn workers):
-
-```bash
-gunicorn -k uvicorn.workers.UvicornWorker app.main:app --bind 0.0.0.0:$PORT
-```
-
-Make sure `gunicorn` is present in `requirements.txt` (it is included in this repo). Render will set the `$PORT` environment variable for you.
-
-Contributing
-------------
-PRs welcome. Please open an issue first for larger changes.
-
-License
--------
-This project is provided as-is. Add your license file if you wish to open-source it.

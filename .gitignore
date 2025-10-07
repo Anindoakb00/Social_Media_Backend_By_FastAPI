@@ -1,3 +1,10 @@
 __pycache__
+__pycache__/
 envv/
+.venv/
 .env
+*.pyc
+__pypackages__/
+test/
+tests/
+/.pytest_cache/
