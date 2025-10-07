@@ -86,6 +86,22 @@ class Settings(BaseSettings):
                 return 30
         # Anything else: return default
         return 30
+    
+    @field_validator('database_url', mode='before')
+    def _normalize_database_url(cls, v):
+        # Some hosting UIs may set an unset/disabled env var to string values like
+        # "false", "None", or "0". Treat those as not provided (None) so the
+        # app can fall back to DB_* fields or raise a clearer error later.
+        if v is None:
+            return None
+        if isinstance(v, str):
+            s = v.strip()
+            if s == "":
+                return None
+            if s.lower() in ("false", "none", "null", "0"):
+                return None
+            return s
+        return v
 
 
 settings = Settings()
