@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Social Media Backend — API</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { padding-top: 3rem; }
+    .hero { background: linear-gradient(90deg,#667eea,#764ba2); color: white; padding: 3rem 2rem; border-radius: .5rem; }
+    .card pre { background: #f8f9fa; padding: .75rem; border-radius: .25rem; }
+    footer { margin-top: 2rem; color: #6c757d; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="hero mb-4">
+      <div class="row align-items-center">
+        <div class="col-md-8">
+          <h1 class="display-6">Social Media Backend</h1>
+          <p class="lead">A lightweight FastAPI service for posts, users, authentication and voting. This service exposes a JSON API documented via OpenAPI at <code>/docs</code>.</p>
+          <p>
+            Quick actions:
+            <a class="btn btn-light btn-sm" href="/docs" role="button">Open API Docs</a>
+            <a class="btn btn-outline-light btn-sm" href="/redoc" role="button">ReDoc</a>
+          </p>
+        </div>
+        <div class="col-md-4 text-md-end mt-3 mt-md-0">
+          <img src="https://raw.githubusercontent.com/github/explore/main/topics/fastapi/fastapi.png" alt="FastAPI" style="height:64px;"/>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-8">
+        <h3>How to test the API</h3>
+        <p>Use <strong>/docs</strong> for interactive testing (Swagger UI). Below are ready-to-run examples you can paste into your terminal.</p>
+
+        <div class="card mb-3">
+          <div class="card-body">
+            <h5>Create a user</h5>
+            <pre>curl -X POST https://socialmedia-x9j7.onrender.com/users/ \
+  -H "Content-Type: application/json" \
+  -d '{"email":"alice@example.com","password":"mypassword"}'</pre>
+          </div>
+        </div>
+
+        <div class="card mb-3">
+          <div class="card-body">
+            <h5>Login (get token)</h5>
+            <p>Note: login expects form-encoded data (not JSON).</p>
+            <pre>curl -X POST https://socialmedia-x9j7.onrender.com/login \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "username=alice@example.com&password=mypassword"</pre>
+          </div>
+        </div>
+
+        <div class="card mb-3">
+          <div class="card-body">
+            <h5>Create a post (authenticated)</h5>
+            <pre>curl -X POST https://socialmedia-x9j7.onrender.com/posts/ \
+  -H "Authorization: Bearer &lt;TOKEN&gt;" \
+  -H "Content-Type: application/json" \
+  -d '{"title":"Hello","content":"Body","published":true}'</pre>
+          </div>
+        </div>
+
+        <div class="card mb-3">
+          <div class="card-body">
+            <h5>List posts</h5>
+            <pre>curl "https://socialmedia-x9j7.onrender.com/posts/?limit=5&skip=0&search=" \
+  -H "Authorization: Bearer &lt;TOKEN&gt;"</pre>
+          </div>
+        </div>
+
+      </div>
+      <div class="col-md-4">
+        <h5>Endpoints</h5>
+        <ul>
+          <li><strong>POST</strong> /users/ — create user</li>
+          <li><strong>POST</strong> /login — obtain token (form data)</li>
+          <li><strong>GET</strong> /posts/ — list posts</li>
+          <li><strong>POST</strong> /posts/ — create post (auth)</li>
+          <li><strong>GET</strong> /posts/{id} — get post</li>
+          <li><strong>PUT</strong> /posts/{id} — update post (owner)</li>
+          <li><strong>DELETE</strong> /posts/{id} — delete post (owner)</li>
+          <li><strong>POST</strong> /vote/ — vote/unvote (auth)</li>
+        </ul>
+
+        <h5>Tips</h5>
+        <ul>
+          <li>Use <code>/docs</code> for interactive API testing and to try the endpoints.</li>
+          <li>Make sure environment variables are set: <code>DATABASE_URL</code>, <code>SECRET_KEY</code>, <code>ALGORITHM</code>.</li>
+          <li>If you see errors, check Render logs (Service → Logs).</li>
+        </ul>
+      </div>
+    </div>
+
+    <footer class="text-center">
+      <small>Built with FastAPI • Deployed on Render</small>
+    </footer>
+  </div>
+</body>
+</html>
