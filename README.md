@@ -17,9 +17,5 @@ Render quick deploy
 3) Set Build Command: pip install -r requirements.txt
 4) Set Start Command: gunicorn -k uvicorn.workers.UvicornWorker app.main:app --bind 0.0.0.0:$PORT
 
-Notes
-- Do NOT commit `.env` or other secrets. Use Render's Environment settings.
-- This repository intentionally excludes Docker/CI/test artifacts for a minimal deploy.
 
-If you'd like I can add an automated migration step (render.yaml or GitHub Actions) later.
-2. Install dependencies:
+
