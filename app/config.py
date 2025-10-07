@@ -1,4 +1,4 @@
-from pydantic import Field
+from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings
 from typing import Optional
 from urllib.parse import urlparse
@@ -16,7 +16,10 @@ class Settings(BaseSettings):
     database_username: Optional[str] = Field(None, env="DATABASE_USERNAME")
     secret_key: str = Field(..., env="SECRET_KEY")
     algorithm: str = Field(..., env="ALGORITHM")
-    access_token_expire_minutes: int = Field(..., env="ACCESS_TOKEN_EXPIRE_MINUTES")
+    # Accept numeric values for the token expiry. Provide a safe default (30 minutes)
+    # and coerce common env string representations. This prevents a hard failure when
+    # a hosting UI accidentally sets the variable to a non-numeric value like "false".
+    access_token_expire_minutes: int = Field(30, env="ACCESS_TOKEN_EXPIRE_MINUTES")
     # Optional single URL (e.g. provided by Render, Heroku, Railway):
     database_url: Optional[str] = Field(None, env="DATABASE_URL")
 
@@ -55,6 +58,34 @@ class Settings(BaseSettings):
                     missing.append(field)
             if missing:
                 raise ValueError(f"Missing required database settings: {', '.join(missing)}")
+
+    # Coerce and validate `access_token_expire_minutes` from environment values.
+    @field_validator('access_token_expire_minutes', mode='before')
+    def _coerce_access_token_expire_minutes(cls, v):
+        # If none provided, use default (already set by Field)
+        if v is None:
+            return 30
+        # If already an int, accept it
+        if isinstance(v, int):
+            return v
+        # Booleans can come through in some environment systems; treat True=1, False=0
+        if isinstance(v, bool):
+            return 1 if v else 0
+        # Strings: try to parse as integer, fallback to default if not numeric
+        if isinstance(v, str):
+            s = v.strip()
+            # common case: numeric string
+            if s.lstrip('-').isdigit():
+                return int(s)
+            # try float-ish strings like '30.0'
+            try:
+                f = float(s)
+                return int(f)
+            except Exception:
+                # handle 'true'/'false' or other non-numeric values by falling back to default
+                return 30
+        # Anything else: return default
+        return 30
 
 
 settings = Settings()
