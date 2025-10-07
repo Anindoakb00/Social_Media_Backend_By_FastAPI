@@ -11,3 +11,4 @@ pytest==8.4.2
 httpx==0.24.1
 gunicorn==23.0.0
 pydantic-settings
+pydantic[email]
