@@ -12,3 +12,4 @@ httpx==0.24.1
 gunicorn==23.0.0
 pydantic-settings
 pydantic[email]
+python-multipart==0.0.6
