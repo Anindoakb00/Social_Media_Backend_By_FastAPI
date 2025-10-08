@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Response, status, HTTPException, Depends, APIRouter
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from .. import models, schemas, utils
 from ..database import get_db
@@ -21,8 +22,19 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
 
     new_user = models.User(**user.dict())
     db.add(new_user)
-    db.commit()
-    db.refresh(new_user)
+    try:
+        db.commit()
+        db.refresh(new_user)
+    except IntegrityError:
+        # most likely a unique constraint (email already exists)
+        db.rollback()
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                            detail="User with this email already exists")
+    except Exception:
+        # Ensure session is rolled back for any other DB error and return a generic error
+        db.rollback()
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                            detail="Internal server error while creating user")
 
     return new_user
 
