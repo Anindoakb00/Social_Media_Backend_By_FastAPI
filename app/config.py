@@ -125,5 +125,23 @@ class Settings(BaseSettings):
         # If it's not a string (unexpected), return the default
         return DEFAULT
 
+    @field_validator('secret_key', mode='before')
+    def _validate_secret_key(cls, v):
+        # Ensure SECRET_KEY is provided and is a usable string. Some hosting
+        # UIs set unset vars to values like 'false' which are not valid
+        # cryptographic secrets. Fail early with a clear error.
+        if v is None:
+            raise ValueError("SECRET_KEY is required and must be a non-empty string. Set SECRET_KEY in environment.")
+        # If the host has provided a boolean-like token, reject it
+        if isinstance(v, bool):
+            raise ValueError("SECRET_KEY must be a string, not a boolean. Set SECRET_KEY in environment to a secure value.")
+        if isinstance(v, str):
+            s = v.strip()
+            if s == "" or s.lower() in ("false", "none", "null", "0"):
+                raise ValueError("SECRET_KEY looks unset (empty or 'false'). Please set a secure SECRET_KEY in environment.")
+            return s
+        # Anything else is invalid
+        raise ValueError("SECRET_KEY must be a string. Please set SECRET_KEY in environment.")
+
 
 settings = Settings()
