@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: socialmedia-backend
+    env: python
+    plan: free
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "gunicorn -k uvicorn.workers.UvicornWorker app.main:app --bind 0.0.0.0:$PORT"
+    # Run alembic migrations automatically as a release command during deploy
+    releaseCommand: "alembic upgrade head"
