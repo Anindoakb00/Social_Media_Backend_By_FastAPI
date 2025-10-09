@@ -108,18 +108,22 @@ class Settings(BaseSettings):
 
     @field_validator('algorithm', mode='before')
     def _normalize_algorithm(cls, v):
-        # Treat empty or common 'false' tokens as not provided so the
-        # default value can be used instead of passing 'false' to jose.
+        # Ensure we always return a valid algorithm string. If the host
+        # provides an unset-like value ("false", "None", ""), fall back
+        # to the default algorithm 'HS256'. Also return the default when
+        # no value is provided (v is None).
+        DEFAULT = "HS256"
         if v is None:
-            return None
+            return DEFAULT
         if isinstance(v, str):
             s = v.strip()
             if s == "":
-                return None
+                return DEFAULT
             if s.lower() in ("false", "none", "null", "0"):
-                return None
+                return DEFAULT
             return s
-        return v
+        # If it's not a string (unexpected), return the default
+        return DEFAULT
 
 
 settings = Settings()
