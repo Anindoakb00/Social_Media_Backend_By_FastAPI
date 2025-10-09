@@ -15,7 +15,10 @@ class Settings(BaseSettings):
     database_name: Optional[str] = Field(None, env="DATABASE_NAME")
     database_username: Optional[str] = Field(None, env="DATABASE_USERNAME")
     secret_key: str = Field(..., env="SECRET_KEY")
-    algorithm: str = Field(..., env="ALGORITHM")
+    # Default to HS256 if the host doesn't provide an algorithm value.
+    # Some hosting UIs set an unset variable to strings like 'false' — we
+    # normalize those to None and then fall back to this default.
+    algorithm: str = Field("HS256", env="ALGORITHM")
     # Accept numeric values for the token expiry. Provide a safe default (30 minutes)
     # and coerce common env string representations. This prevents a hard failure when
     # a hosting UI accidentally sets the variable to a non-numeric value like "false".
@@ -92,6 +95,21 @@ class Settings(BaseSettings):
         # Some hosting UIs may set an unset/disabled env var to string values like
         # "false", "None", or "0". Treat those as not provided (None) so the
         # app can fall back to DB_* fields or raise a clearer error later.
+        if v is None:
+            return None
+        if isinstance(v, str):
+            s = v.strip()
+            if s == "":
+                return None
+            if s.lower() in ("false", "none", "null", "0"):
+                return None
+            return s
+        return v
+
+    @field_validator('algorithm', mode='before')
+    def _normalize_algorithm(cls, v):
+        # Treat empty or common 'false' tokens as not provided so the
+        # default value can be used instead of passing 'false' to jose.
         if v is None:
             return None
         if isinstance(v, str):
